@@ -36,20 +36,19 @@ void	ft_str_cut(char *str, char **line)
 	*line = str;
 }
 
-char	*ft_strjoin_free(char *s1, char *s2)
+char	*ft_strjoin_free(t_mstr mstr)
 {
 	char	*dst;
 
-	if (!s1 || !s2)
+	if (!mstr.str || !mstr.buff)
 		return (NULL);
-	dst = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
+	dst = ft_strnew(ft_strlen(mstr.str) + ft_strlen(mstr.buff));
 	if (!dst)
 		return (NULL);
-	dst = ft_strcpy(dst, s1);
-	free(s1);
-	ft_putendl("FLAAAAAAAAAG");
-	dst = ft_strcat(dst , s2);	
-	free(s2);
+	dst = ft_strcpy(dst, mstr.str);
+	free(mstr.str - mstr.diff);
+	dst = ft_strcat(dst , mstr.buff);	
+	free(mstr.buff);
 	return (dst);
 }
 
@@ -64,7 +63,10 @@ int		return_line(char **line, t_mstr *mstr, int ret)
 		ft_str_cut(tmp, line);
 		free(tmp);
 		if ((ft_strchr(mstr->str, '\n') + 1))
+		{
+			mstr->diff = (ft_strchr(mstr->str, '\n') + 1) - mstr->str;
 			mstr->str = ft_strchr(mstr->str, '\n') + 1;
+		}
 		return (1);
 	}
 	if (!ret)
@@ -74,11 +76,9 @@ int		return_line(char **line, t_mstr *mstr, int ret)
 		free(tmp);
 		return (1);
 	}
-	else
-	{
-		free(tmp);
-		return (0);
-	}
+	mstr->diff = 0;
+	free(tmp);
+	return (0);
 }
 
 int		get_next_line(int fd, char **line)
@@ -93,6 +93,7 @@ int		get_next_line(int fd, char **line)
 	{
 		mstr.str = ft_strnew(0);
 		mstr.flag = 1;
+		mstr.diff = 0;
 	}
 	while (ret && mstr.flag)
 	{
@@ -100,15 +101,11 @@ int		get_next_line(int fd, char **line)
 		if ((ret = read(fd, mstr.buff, BUFF_SIZE)) < 0)
 			return (-1);
 		mstr.buff[ret] = '\0';
-		mstr.str = ft_strjoin_free(mstr.str, mstr.buff);
+		mstr.str = ft_strjoin_free(mstr);
 		if (!ft_strlen(mstr.str))
-		{
-			free(mstr.str);
 			return (0);
-		}
 		if (return_line(line, &mstr, ret))
 			return (1);
 	}
-	free(mstr.str);
 	return (0);
 }

@@ -20,9 +20,10 @@
 
 typedef	struct			s_mstr
 {
-	char 			*str;
-	char			*buff;
-	int				flag;
+		char 			*str;
+		char			*buff;
+		int				flag;
+		int				diff;
 }						t_mstr;
 
 int				get_next_line(const int fd, char **line);
